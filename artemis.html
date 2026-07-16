@@ -1,0 +1,196 @@
+<!doctypehtml>
+  <html lang=en-us>
+
+    <head>
+      <meta charset=utf-8>
+      <meta content="text/html; charset=utf-8" http-equiv=Content-Type>
+      <meta content="width=device-width,user-scalable=no,maximum-scale=1,initial-scale=1" name=viewport>
+      <title>Stella of the End</title>
+      <link rel="icon" href="favicon.ico">
+      <style>
+        @font-face {
+          font-family: 'NotoSerifSC';
+          src: url('./font/notoserifsc-medium.otf') format('opentype');
+          font-weight: 500;
+          font-style: normal;
+        }
+
+        * {
+          box-sizing: border-box;
+        }
+    
+        body {
+          background: #fff;
+          color: #000;
+          font-family: 'NotoSerifSC', serif;
+          margin: 0;
+          padding: 0;
+          text-align: center;
+        }
+
+        .emscripten_border {
+          border: none !important;
+          display: inline-block;
+        }
+    
+        canvas.emscripten {
+          border: 0 none !important;
+          background-color: transparent !important;
+          display: block;
+          margin: 0 auto;
+        }
+
+        .spinner {
+          height: 50px;
+          width: 50px;
+          margin: 20px auto 10px;
+          border-left: 10px solid #000;
+          border-right: 10px solid #000;
+          border-bottom: 10px solid #000;
+          border-top: 10px solid #888;
+          border-radius: 100%;
+          background-color: #fff;
+          animation: rotation .8s linear infinite;
+          -webkit-animation: rotation .8s linear infinite;
+          -moz-animation: rotation .8s linear infinite;
+          -o-animation: rotation .8s linear infinite;
+        }
+    
+        @keyframes rotation {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+        @-webkit-keyframes rotation {
+          from { -webkit-transform: rotate(0deg); }
+          to   { -webkit-transform: rotate(360deg); }
+        }
+        @-moz-keyframes rotation {
+          from { -moz-transform: rotate(0deg); }
+          to   { -moz-transform: rotate(360deg); }
+        }
+        @-o-keyframes rotation {
+          from { -o-transform: rotate(0deg); }
+          to   { -o-transform: rotate(360deg); }
+        }
+
+        #status {
+          font-family: 'NotoSerifSC', serif;
+          color: #000;
+          margin: 6px 0;
+          font-size: 14px;
+        }
+
+        progress {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 200px;
+          height: 8px;
+          border: 1px solid #888;
+          background-color: #eee;
+          border-radius: 4px;
+          color: #000;
+        }
+        progress::-webkit-progress-bar {
+          background-color: #eee;
+          border-radius: 4px;
+        }
+        progress::-webkit-progress-value {
+          background-color: #000;
+          border-radius: 4px;
+        }
+        progress::-moz-progress-bar {
+          background-color: #000;
+          border-radius: 4px;
+        }
+
+        .emscripten {
+          text-align: center;
+          font-family: 'NotoSerifSC', serif;
+        }
+    
+        .emscripten strong {
+          color: #000;
+        }
+
+        figure#spinner {
+          margin: 0 auto;
+          overflow: visible;
+        }
+      </style>
+    </head>
+
+    <body>
+      <script>
+        var passiveSupported = !1;
+        try {
+          document.addEventListener("test", null, Object.defineProperty({}, "passive", {
+            get: function() {
+              passiveSupported = !0
+            }
+          }))
+        } catch (e) {}
+        document.addEventListener("touchstart", (function(e) {
+          e.preventDefault()
+        }), !!passiveSupported && {
+          passive: !1
+        }), document.addEventListener("touchmove", (function(e) {
+          e.preventDefault()
+        }), !!passiveSupported && {
+          passive: !1
+        })
+      </script>
+      <figure id=spinner style=overflow:visible>
+        <div class=spinner></div>
+        <center style=margin-top:.5em><strong>星之终途</strong></center>
+      </figure>
+      <div class=emscripten id=status>Downloading...</div>
+      <div class=emscripten><progress hidden id=progress max=100 value=0></progress></div>
+      <div class=emscripten_border><canvas class=emscripten id=canvas oncontextmenu=event.preventDefault() tabindex=-1></canvas></div>
+      <script>
+        var statusElement = document.getElementById("status"),
+          progressElement = document.getElementById("progress"),
+          spinnerElement = document.getElementById("spinner"),
+          Module = {
+            preRun: [],
+            postRun: [],
+            print: function() {
+              var e = document.getElementById("output");
+              return e && (e.value = ""),
+                function(t) {
+                  arguments.length > 1 && (t = Array.prototype.slice.call(arguments).join(" ")), console.log(t), e && (e.value += t + "\n", e.scrollTop = e.scrollHeight)
+                }
+            }(),
+            printErr: function(e) {
+              arguments.length > 1 && (e = Array.prototype.slice.call(arguments).join(" ")), console.error(e)
+            },
+            canvas: function() {
+              var e = document.getElementById("canvas");
+              return e.addEventListener("webglcontextlost", (function(e) {
+                alert("WebGL context lost. You will need to reload the page."), e.preventDefault()
+              }), !1), e
+            }(),
+            setStatus: function(e) {
+              if (Module.setStatus.last || (Module.setStatus.last = {
+                  time: Date.now(),
+                  text: ""
+                }), e !== Module.setStatus.last.text) {
+                var t = e.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/),
+                  n = Date.now();
+                t && n - Module.setStatus.last.time < 30 || (Module.setStatus.last.time = n, Module.setStatus.last.text = e, t ? (e = t[1], progressElement.value = 100 * parseInt(t[2]), progressElement.max = 100 * parseInt(t[4]), progressElement.hidden = !1, spinnerElement.hidden = !1) : (progressElement.value = null, progressElement.max = null, progressElement.hidden = !0, e || (spinnerElement.hidden = !0)), statusElement.innerHTML = e)
+              }
+            },
+            totalDependencies: 0,
+            monitorRunDependencies: function(e) {
+              this.totalDependencies = Math.max(this.totalDependencies, e), Module.setStatus(e ? "准备中... (" + (this.totalDependencies - e) + "/" + this.totalDependencies + ")" : "所有下载已完成。")
+            }
+          };
+        Module.setStatus("Downloading..."), window.onerror = function() {
+          Module.setStatus("Exception thrown, see JavaScript console"), spinnerElement.style.display = "none", Module.setStatus = function(e) {
+            e && Module.printErr("[post-exception status] " + e)
+          }
+        }
+      </script>
+      <script async src=artemis.js></script>
+    </body>
+
+  </html>
