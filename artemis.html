@@ -224,9 +224,7 @@
                             arguments.length > 1 && (t = Array.prototype.slice.call(arguments).join(" ")), console.log(t), e && (e.value += t + "\n", e.scrollTop = e.scrollHeight)
                         }
                 }(),
-                printErr: function(e) {
-    			console.error(e);
-		},
+                printErr: function(e) {},
                 canvas: function() {
                     var e = document.getElementById("canvas");
                     return e.addEventListener("webglcontextlost", (function(e) {
