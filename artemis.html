@@ -10,7 +10,7 @@
     <style>
         @font-face {
             font-family: 'NotoSerifSC';
-            src: url('./font/notoserifsc-medium.otf') format('opentype');
+            src: url('./notoserifsc-medium.otf') format('opentype');
             font-weight: 500;
             font-style: normal;
         }
@@ -224,7 +224,9 @@
                             arguments.length > 1 && (t = Array.prototype.slice.call(arguments).join(" ")), console.log(t), e && (e.value += t + "\n", e.scrollTop = e.scrollHeight)
                         }
                 }(),
-                printErr: function(e) {},
+                printErr: function(e) {
+    			console.error(e);
+		},
                 canvas: function() {
                     var e = document.getElementById("canvas");
                     return e.addEventListener("webglcontextlost", (function(e) {
